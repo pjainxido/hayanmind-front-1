@@ -13,7 +13,6 @@ const InfiniteScrollList= () => {
   };
 
   const callAPI = async (page) => {
-    console.log(page);
     try {
       const response = await fetch(`https://jsonplaceholder.typicode.com/comments?_page=${page}&_limit=${LIMIT}`);
       const data = await response.json();
@@ -56,7 +55,7 @@ const InfiniteScrollList= () => {
           return <CommentBox data={item} key={idx} />;
         })}
       </div>
-      <div ref={setLoadRef}>loading</div>
+      <div ref={setLoadRef}></div>
     </div>
   );
 };
