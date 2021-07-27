@@ -11,23 +11,25 @@ const InfiniteScrollList= () => {
   const loadComment = () => {
     setPage((prev) => prev + 1);
   };
+
   const callAPI = async (page) => {
     console.log(page);
     try {
       const response = await fetch(`https://jsonplaceholder.typicode.com/comments?_page=${page}&_limit=${LIMIT}`);
       const data = await response.json();
-      setCommentList([...commentList, ...data]);
+      setCommentList((prev)=>[...prev, ...data]);
     } catch (err) {
       console.error(err);
     }
   };
+
   useEffect(() => {
     callAPI(page);
   }, [page]);
 
   const onInterSecting = (entries) => {
     const target = entries[0];
-    if (target.isIntersecting) {
+    if (target.isIntersecting ) {
       loadComment();
     }
   };
@@ -36,18 +38,16 @@ const InfiniteScrollList= () => {
     const options = {
       root: null,
       rootMargin: '20px',
-      threshold: 0,
+      threshold: 1 
     };
-    console.log(loadRef);
 
     let observer;
-    if (loadRef) {
+    if (loadRef && commentList.length) {
       observer = new IntersectionObserver(onInterSecting, options);
-      console.log(observer);
       observer.observe(loadRef);
     }
     return () => observer?.disconnect();
-  }, [loadRef]);
+  }, [commentList]);
 
   return (
     <div className={styles.container}>
@@ -56,8 +56,6 @@ const InfiniteScrollList= () => {
           return <CommentBox data={item} key={idx} />;
         })}
       </div>
-      <button onClick={() => loadComment()}>text</button>
-
       <div ref={setLoadRef}>loading</div>
     </div>
   );
