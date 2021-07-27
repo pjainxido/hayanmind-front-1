@@ -13,10 +13,11 @@
 }
 
 .item {
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  flex-wrap: wrap;
+  /* align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    flex-wrap: wrap; */
+  margin: 0 auto;
   width: 500px;
   height: 193px;
   margin-bottom: 12px;
