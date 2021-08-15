@@ -1,52 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import styles from './InfiniteScrollList.module.css'
-import CommentBox from './CommentBox';
+import React, { useState, useEffect } from "react";
+import useInterSection from "../../hooks/useInterSection";
+import { callAPI } from "../../utils";
+import styles from "./InfiniteScrollList.module.css";
+import CommentBox from "./CommentBox";
 
-const InfiniteScrollList= () => {
+const InfiniteScrollList = () => {
   const LIMIT = 10;
-  const [loadRef, setLoadRef] = useState(null);
   const [page, setPage] = useState(1);
   const [commentList, setCommentList] = useState([]);
-
   const loadComment = () => {
     setPage((prev) => prev + 1);
   };
+  const { setRef } = useInterSection(loadComment, commentList);
 
-  const callAPI = async (page) => {
+  const getComments = async (page) => {
     try {
-      const response = await fetch(`https://jsonplaceholder.typicode.com/comments?_page=${page}&_limit=${LIMIT}`);
-      const data = await response.json();
-      setCommentList((prev)=>[...prev, ...data]);
-    } catch (err) {
-      console.error(err);
+      const query = {
+        _page: page,
+        _limit: LIMIT,
+      };
+      const data = await callAPI("https://jsonplaceholder.typicode.com/comments", query);
+      setCommentList((prev) => [...prev, ...data]);
+    } catch (error) {
+      console.error(error);
     }
   };
 
   useEffect(() => {
-    callAPI(page);
+    getComments(page);
   }, [page]);
-
-  const onInterSecting = (entries) => {
-    const target = entries[0];
-    if (target.isIntersecting ) {
-      loadComment();
-    }
-  };
-
-  useEffect(() => {
-    const options = {
-      root: null,
-      rootMargin: '20px',
-      threshold: 1 
-    };
-
-    let observer;
-    if (loadRef && commentList.length) {
-      observer = new IntersectionObserver(onInterSecting, options);
-      observer.observe(loadRef);
-    }
-    return () => observer?.disconnect();
-  }, [commentList]);
 
   return (
     <div className={styles.container}>
@@ -55,7 +37,7 @@ const InfiniteScrollList= () => {
           return <CommentBox data={item} key={idx} />;
         })}
       </div>
-      <div ref={setLoadRef}></div>
+      <div ref={setRef}></div>
     </div>
   );
 };
